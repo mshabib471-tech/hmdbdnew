@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { MediaItem } from '../types';
 
 export default function MediaCard({ item }: { item: MediaItem }) {
+  const navigate = useNavigate();
   const type = item.media_type || (item.title ? 'movie' : 'tv');
   const title = item.title || item.name || 'Untitled';
   const posterUrl = item.poster_path 
@@ -12,8 +13,15 @@ export default function MediaCard({ item }: { item: MediaItem }) {
   const date = item.release_date || item.first_air_date || '';
   const year = date.length >= 4 ? date.substring(0, 4) : '';
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Open ad in new tab, navigate current tab to details
+    window.open('https://www.profitableratecpmnetwork.com/xxfn6fg10?key=9c83f364401eaf30792f6057fce42102', '_blank');
+    navigate(`/${type}/${item.id}`);
+  };
+
   return (
-    <Link to={`/${type}/${item.id}`} className="group relative block rounded-xl overflow-hidden aspect-[2/3] bg-hmdbd-surface">
+    <div onClick={handleCardClick} className="group relative block rounded-xl overflow-hidden aspect-[2/3] bg-hmdbd-surface cursor-pointer">
       <img 
         src={posterUrl} 
         alt={title}
@@ -37,6 +45,6 @@ export default function MediaCard({ item }: { item: MediaItem }) {
           ⭐ {item.vote_average.toFixed(1)}
         </div>
       ) : null}
-    </Link>
+    </div>
   );
 }

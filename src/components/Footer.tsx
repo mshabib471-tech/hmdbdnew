@@ -18,8 +18,7 @@ export default function Footer() {
         </div>
 
         <div className="text-sm text-gray-500 text-right">
-          Powered by TMDB API.<br />
-          Not affiliated with any streaming service.
+          Powered by Habibur Rahman
         </div>
       </div>
     </footer>

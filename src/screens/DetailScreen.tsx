@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Play, Bookmark, BookmarkCheck, ArrowLeft, Star, Download } from 'lucide-react';
+import { Play, Bookmark, BookmarkCheck, ArrowLeft, Star, Download, Users } from 'lucide-react';
 import { tmdbApi } from '../api/tmdb';
-import { MediaDetailDto } from '../types';
+import { MediaDetailDto, CastMemberDto, MediaItem } from '../types';
 import { useMediaStore } from '../store/useMediaStore';
 import AdBanner from '../components/AdBanner';
+import MediaCard from '../components/MediaCard';
 
 export default function DetailScreen() {
   const { type, id } = useParams<{ type: 'movie' | 'tv'; id: string }>();
   const navigate = useNavigate();
   const [details, setDetails] = useState<MediaDetailDto | null>(null);
+  const [cast, setCast] = useState<CastMemberDto[]>([]);
+  const [similar, setSimilar] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { savedMedia, addToWatchlist, removeFromWatchlist } = useMediaStore();
@@ -22,10 +25,15 @@ export default function DetailScreen() {
     const fetchDetails = async () => {
       setLoading(true);
       try {
-        const data = type === 'movie' 
-          ? await tmdbApi.getMovieDetails(mediaId)
-          : await tmdbApi.getTvDetails(mediaId);
-        setDetails(data);
+        const [detailsData, creditsData, similarData] = await Promise.all([
+          type === 'movie' ? tmdbApi.getMovieDetails(mediaId) : tmdbApi.getTvDetails(mediaId),
+          type === 'movie' ? tmdbApi.getMovieCredits(mediaId) : tmdbApi.getTvCredits(mediaId),
+          type === 'movie' ? tmdbApi.getSimilarMovies(mediaId) : tmdbApi.getSimilarTv(mediaId)
+        ]);
+        
+        setDetails(detailsData);
+        setCast(creditsData.cast.slice(0, 15));
+        setSimilar(similarData.results.filter(m => m.poster_path).slice(0, 12).map(m => ({...m, media_type: type})));
       } catch (error) {
         console.error("Failed to fetch details:", error);
       } finally {
@@ -77,14 +85,8 @@ export default function DetailScreen() {
 
   const handlePlayClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    const hasClicked = sessionStorage.getItem(`ad_${mediaId}`);
-    if (!hasClicked) {
-      sessionStorage.setItem(`ad_${mediaId}`, 'true');
-      window.open('https://www.profitableratecpmnetwork.com/xxfn6fg10?key=9c83f364401eaf30792f6057fce42102', '_blank');
-      navigate(`/play/${type}/${mediaId}`);
-    } else {
-      navigate(`/play/${type}/${mediaId}`);
-    }
+    window.open('https://www.profitableratecpmnetwork.com/xxfn6fg10?key=9c83f364401eaf30792f6057fce42102', '_blank');
+    navigate(`/play/${type}/${mediaId}`);
   };
 
   return (
@@ -177,6 +179,45 @@ export default function DetailScreen() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-16 space-y-12">
+        {/* Cast Section */}
+        {cast.length > 0 && (
+          <section>
+            <div className="flex items-center gap-2 mb-6">
+              <Users size={24} className="text-hmdbd-orange" />
+              <h2 className="text-xl md:text-2xl font-bold text-white">Top Cast</h2>
+            </div>
+            <div className="flex overflow-x-auto hide-scrollbar gap-4 pb-4">
+              {cast.map(actor => (
+                <div key={actor.id} className="flex-none w-28 md:w-36 flex flex-col items-center bg-hmdbd-surface p-3 rounded-xl border border-gray-800">
+                  <img 
+                    src={actor.profile_path ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` : 'https://via.placeholder.com/200x300?text=No+Photo'} 
+                    alt={actor.name} 
+                    className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover mb-3 shadow-lg"
+                  />
+                  <h4 className="text-sm font-bold text-white text-center leading-tight mb-1">{actor.name}</h4>
+                  <p className="text-xs text-gray-400 text-center line-clamp-2">{actor.character}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Similar Movies Section */}
+        {similar.length > 0 && (
+          <section>
+            <h2 className="text-xl md:text-2xl font-bold mb-6 text-white px-2 border-l-4 border-hmdbd-orange">
+              Similar {type === 'movie' ? 'Movies' : 'TV Shows'}
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {similar.map(item => (
+                <MediaCard key={`similar-${item.id}`} item={item} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

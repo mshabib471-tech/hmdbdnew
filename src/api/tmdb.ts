@@ -39,6 +39,8 @@ export const tmdbApi = {
   getPopularTv: (page = 1) => fetchApi<TmdbPageResponse>('/tv/popular', { page }),
   getTopRatedTv: (page = 1) => fetchApi<TmdbPageResponse>('/tv/top_rated', { page }),
   
+  getMovieGenres: () => fetchApi<{genres: GenreDto[]}>('/genre/movie/list'),
+  
   searchMulti: (query: string, page = 1) => fetchApi<TmdbPageResponse>('/search/multi', { query, page }),
   discoverMoviesByGenre: (genreId: number, page = 1) => fetchApi<TmdbPageResponse>('/discover/movie', { with_genres: genreId, page, sort_by: 'popularity.desc' }),
   
