@@ -41,6 +41,20 @@ export const tmdbApi = {
   
   getMovieGenres: () => fetchApi<{genres: GenreDto[]}>('/genre/movie/list'),
   
+  discoverByCategory: (category: string, page = 1) => {
+    if (category === 'movies') {
+      return fetchApi<TmdbPageResponse>('/discover/movie', { page, sort_by: 'popularity.desc' });
+    } else if (category === 'tv' || category === 'series') {
+      return fetchApi<TmdbPageResponse>('/discover/tv', { page, sort_by: 'popularity.desc' });
+    } else if (category === 'anime') {
+      return fetchApi<TmdbPageResponse>('/discover/tv', { page, with_genres: 16, with_original_language: 'ja', sort_by: 'popularity.desc' });
+    } else if (category === 'adult') {
+      // TMDB doesn't allow explicit porn, but this fetches R-rated romance/thriller for 18+ vibe
+      return fetchApi<TmdbPageResponse>('/discover/movie', { page, include_adult: true, certification_country: 'US', certification: 'R', sort_by: 'popularity.desc' });
+    }
+    return fetchApi<TmdbPageResponse>('/discover/movie', { page });
+  },
+  
   searchMulti: (query: string, page = 1) => fetchApi<TmdbPageResponse>('/search/multi', { query, page }),
   discoverMoviesByGenre: (genreId: number, page = 1) => fetchApi<TmdbPageResponse>('/discover/movie', { with_genres: genreId, page, sort_by: 'popularity.desc' }),
   
