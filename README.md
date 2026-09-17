@@ -1,11 +1,16 @@
-<div align="center">
+# HMDBD Web
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+This project is a React web port of the original HMDBD Android application.
 
-  <h1>Built with AI Studio</h2>
+## Features Preserved
+- TMDB API Integration for Trending, Popular, Top Rated, and Search
+- Detailed movie and TV show pages
+- Embedded Video Player for streaming
+- Watchlist and local persistence using Zustand
 
-  <p>The fastest path from prompt to production with Gemini.</p>
-
-  <a href="https://aistudio.google.com/apps">Start building</a>
-
-</div>
+## Tech Stack
+- React 18
+- Vite
+- Tailwind CSS
+- React Router DOM
+- Zustand (Local Storage)

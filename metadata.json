@@ -1,0 +1,7 @@
+{
+  "name": "HMDBD",
+  "description": "Watch and discover the latest trending movies, Hollywood hits, TV shows, and smart streaming entertainment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
